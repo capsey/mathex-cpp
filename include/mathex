@@ -2,6 +2,7 @@
 #define MATHEX_HEADER
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -131,7 +132,8 @@ namespace mathex
         Error evaluate(const std::string &expression, double &result);
 
     private:
-        std::unordered_map<std::string, Token *> m_Tokens;
+        Flags m_Flags;
+        std::unordered_map<std::string, std::unique_ptr<Token>> m_Tokens;
     };
 }
 
