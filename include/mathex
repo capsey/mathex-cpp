@@ -4,6 +4,7 @@
 #include <functional>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 
 namespace mathex
 {
@@ -58,6 +59,11 @@ namespace mathex
     };
 
     using Function = std::function<Error(double[], int, double &)>;
+
+    /**
+     * @brief Token of math expression.
+     */
+    class Token;
 
     /**
      * @brief Configuration for parsing.
@@ -123,6 +129,9 @@ namespace mathex
          * @return Returns Error::Success, or error code if expression contains any errors.
          */
         Error evaluate(const std::string &expression, double &result);
+
+    private:
+        std::unordered_map<std::string, Token *> m_Tokens;
     };
 }
 
