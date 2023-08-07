@@ -1,0 +1,129 @@
+#ifndef MATHEX_HEADER
+#define MATHEX_HEADER
+
+#include <functional>
+#include <string>
+#include <type_traits>
+
+namespace mathex
+{
+    /**
+     * @brief Evaluation parameters.
+     */
+    enum class Flags
+    {
+        None = 0,                   // Disable all parameters.
+        ImplicitParentheses = 1,    // Enable implicit parentheses.
+        ImplicitMultiplication = 2, // Enable implicit multiplication.
+        ScientificNotation = 4,     // Enable numbers in scientific notati
+        Addition = 8,               // Enable addition operator.
+        Substraction = 16,          // Enable substraction operator.
+        Multiplication = 32,        // Enable multiplication operator.
+        Division = 64,              // Enable division operator.
+        Exponentiation = 128,       // Enable exponentiation operator.
+        Modulus = 256,              // Enable modulus operator.
+        Identity = 512,             // Enable unary identity operator.
+        Negation = 1024,            // Enable unary negation operator.
+    };
+
+    inline constexpr Flags operator+(Flags a, Flags b)
+    {
+        return static_cast<Flags>(static_cast<std::underlying_type<Flags>::type>(a) | static_cast<std::underlying_type<Flags>::type>(b));
+    }
+
+    inline constexpr Flags operator-(Flags a, Flags b)
+    {
+        return static_cast<Flags>(static_cast<std::underlying_type<Flags>::type>(a) & ~static_cast<std::underlying_type<Flags>::type>(b));
+    }
+
+    /**
+     * @brief Default parameters. Does not include exponentiation and modulus operators.
+     */
+    constexpr Flags DefaultFlags = Flags::ImplicitParentheses + Flags::ImplicitMultiplication + Flags::ScientificNotation + Flags::Addition + Flags::Substraction + Flags::Multiplication + Flags::Division + Flags::Identity + Flags::Negation;
+
+    /**
+     * @brief Error codes.
+     */
+    enum class Error
+    {
+        Success = 0,      // Parsed successfully.
+        IllegalName,      // Name of variable/function contains illegal characters.
+        AlreadyDefined,   // Trying to add a variable/function that already exists.
+        OutOfMemory,      // Out of memory.
+        DivisionByZero,   // Division by zero.
+        SyntaxError,      // Expression syntax is invalid.
+        Undefined,        // Function or variable name not found.
+        InvalidArgs,      // Arguments validation failed.
+        IncorrectArgsNum, // Incorrect number of arguments.
+    };
+
+    using Function = std::function<Error(double[], int, double &)>;
+
+    /**
+     * @brief Configuration for parsing.
+     */
+    class Config
+    {
+    public:
+        /**
+         * @brief Creates empty configuration object with given parsing parameters.
+         *
+         * @param flags Evaluation flags.
+         */
+        Config(Flags flags = DefaultFlags);
+        ~Config();
+
+        /**
+         * @brief Inserts a variable into the configuration object to be available for use in the expressions.
+         *
+         * @param name String representing name of the variable. (should only contain letters, digits or underscore and cannot start with a digit)
+         * @param value Reference to value of the variable. Lifetime of a reference is responsibility of a caller.
+         *
+         * @return Returns Error::Success, or error code if failed to insert.
+         */
+        Error addVariable(const std::string &name, const double &value);
+
+        /**
+         * @brief Inserts a constant into the configuration object to be available for use in the expressions.
+         *
+         * @param name String representing name of the variable. (should only contain letters, digits or underscore and cannot start with a digit)
+         * @param value Value of a constant variable.
+         *
+         * @return Returns Error::Success, or error code if failed to insert.
+         */
+        Error addConstant(const std::string &name, double value);
+
+        /**
+         * @brief Inserts a function into the configuration object to be available for use in the expressions.
+         *
+         * @param name String representing name of the function. (should only contain letters, digits or underscore and cannot start with a digit)
+         * @param apply Function that takes the arguments, writes the result to the given reference and returns Error::Success or appropriate error code.
+         *
+         * @return Returns Error::Success, or error code if failed to insert.
+         */
+        Error addFunction(const std::string &name, Function apply);
+
+        /**
+         * @brief Removes a variable or a function with given name that was added using `addVariable`, `addConstant` or `addFunction`.
+         *
+         * @param name String representing name of the variable or function to remove.
+         *
+         * @return Returns Error::Success, or error code if failed to remove.
+         */
+        Error remove(const std::string &name);
+
+        /**
+         * @brief Takes mathematical expression and evaluates its numerical value.
+         *
+         * Result of the evaluation is written into a `result` reference. If evaluation failed, returns error code.
+         *
+         * @param expression String to evaluate.
+         * @param result Reference to write evaluation result to.
+         *
+         * @return Returns Error::Success, or error code if expression contains any errors.
+         */
+        Error evaluate(const std::string &expression, double &result);
+    };
+}
+
+#endif /* MATHEX_HEADER */
