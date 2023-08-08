@@ -14,6 +14,13 @@ SRC := $(wildcard $(SRCDIR)/*.cpp)
 OBJ := $(patsubst $(SRCDIR)/%.cpp, $(SRCBINDIR)/%.o, $(SRC))
 LIBRARY := $(BINDIR)/libmathex++.a
 
+# Testing variables
+TESTDIR := ./test
+TESTBINDIR := $(TESTDIR)/bin
+
+TESTSRC := $(wildcard $(TESTDIR)/*.cpp)
+TESTBIN := $(patsubst $(TESTDIR)/%.cpp, $(TESTBINDIR)/%, $(TESTSRC))
+
 # Sample variables
 SAMPLEDIR := ./sample
 SAMPLEBINDIR := $(SAMPLEDIR)/bin
@@ -21,8 +28,11 @@ SAMPLEBINDIR := $(SAMPLEDIR)/bin
 # Phonies
 build: $(LIBRARY)
 
+test: $(TESTBIN)
+	CODE=0; for test in $(TESTBIN); do $$test || CODE=$$?; done; exit $$CODE
+
 clean:
-	$(RM) $(BINDIR)/* $(SRCBINDIR)/* $(SAMPLEBINDIR)/*
+	$(RM) $(BINDIR)/* $(SRCBINDIR)/* $(TESTBINDIR)/* $(SAMPLEBINDIR)/*
 
 # Library
 $(LIBRARY): $(OBJ) | $(BINDIR)
@@ -30,6 +40,10 @@ $(LIBRARY): $(OBJ) | $(BINDIR)
 
 $(SRCBINDIR)/%.o: $(SRCDIR)/%.cpp | $(SRCBINDIR)
 	$(CXX) $(LIBFLAGS) $(INCLUDES) -c $< -o $@
+
+# Testing
+$(TESTBINDIR)/%: $(TESTDIR)/%.cpp $(LIBRARY) | $(TESTBINDIR)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -o $@ -L$(BINDIR) -lmathex++ -lcriterion
 
 # Samples
 $(SAMPLEBINDIR)/%: $(SAMPLEDIR)/%.cpp $(LIBRARY) | $(SAMPLEBINDIR)
@@ -40,6 +54,9 @@ $(BINDIR):
 	mkdir -p $@
 
 $(SRCBINDIR):
+	mkdir -p $@
+
+$(TESTBINDIR):
 	mkdir -p $@
 
 $(SAMPLEBINDIR):
