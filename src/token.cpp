@@ -1,10 +1,44 @@
-#include "mathex"
 #include "token.hpp"
-#include <functional>
+#include "mathex"
 #include <cmath>
+#include <functional>
 
 namespace mathex
 {
+    Token::Token(const Token &token)
+    {
+        this->type = token.type;
+
+        switch (this->type)
+        {
+        case TokenType::Constant:
+            this->constant = token.constant;
+            break;
+
+        case TokenType::Variable:
+            this->variable = token.variable;
+            break;
+
+        case TokenType::Function:
+            new (&this->function) auto(token.function);
+            break;
+
+        case TokenType::BinaryOperator:
+            new (&this->binaryOperator.invoke) auto(token.binaryOperator.invoke);
+            this->binaryOperator.precedence = token.binaryOperator.precedence;
+            this->binaryOperator.leftAssociative = token.binaryOperator.leftAssociative;
+            break;
+
+        case TokenType::UnaryOperator:
+            new (&this->unaryOperator) auto(token.unaryOperator);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    Token::Token(TokenType emptyType) : type(emptyType) {}
     Token::Token(double constant) : type(TokenType::Constant), constant(constant) {}
     Token::Token(const double *variable) : type(TokenType::Variable), variable(variable) {}
     Token::Token(Function function) : type(TokenType::Function), function(function) {}
@@ -25,6 +59,9 @@ namespace mathex
 
         case TokenType::UnaryOperator:
             this->unaryOperator.~function();
+            break;
+
+        default:
             break;
         }
     }

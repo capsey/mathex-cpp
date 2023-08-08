@@ -3,10 +3,11 @@
 #include <algorithm>
 #include <cctype>
 #include <memory>
+#include <type_traits>
 
 namespace mathex
 {
-    Config::Config(Flags flags = DefaultFlags) : m_Flags(flags) {}
+    Config::Config(Flags flags /* = DefaultFlags */) : m_Flags(flags) {}
 
     Config::~Config() {}
 
@@ -18,6 +19,7 @@ namespace mathex
         }
 
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(&value));
+        return Error::Success;
     }
 
     Error Config::addConstant(const std::string &name, double value)
@@ -28,6 +30,7 @@ namespace mathex
         }
 
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(value));
+        return Error::Success;
     }
 
     Error Config::addFunction(const std::string &name, Function apply)
@@ -38,6 +41,7 @@ namespace mathex
         }
 
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(apply));
+        return Error::Success;
     }
 
     Error Config::remove(const std::string &name)
@@ -48,5 +52,10 @@ namespace mathex
         }
 
         return Error::Success;
+    }
+
+    bool Config::readFlag(Flags flag)
+    {
+        return static_cast<Flags>(static_cast<std::underlying_type<Flags>::type>(this->m_Flags) & static_cast<std::underlying_type<Flags>::type>(flag)) != Flags::None;
     }
 }

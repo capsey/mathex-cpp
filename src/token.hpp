@@ -22,11 +22,13 @@ namespace mathex
     class Token
     {
     public:
-        Token(double constant);
-        Token(const double *variable);
-        Token(Function function);
-        Token(BinaryOperator binaryOperator, int precedence, bool leftAssociative);
-        Token(UnaryOperator unaryOperator);
+        Token(const Token &token);                                                  // Copy
+        Token(TokenType emptyType);                                                 // Empty token
+        Token(double constant);                                                     // Constant
+        Token(const double *variable);                                              // Variable
+        Token(Function function);                                                   // Function
+        Token(BinaryOperator binaryOperator, int precedence, bool leftAssociative); // Binary operator
+        Token(UnaryOperator unaryOperator);                                         // Unary operator
         ~Token();
 
         TokenType type;
