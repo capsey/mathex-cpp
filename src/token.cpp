@@ -25,38 +25,35 @@
 #include <cmath>
 #include <functional>
 
-namespace mathex
-{
-    Token::Token(const Token &token)
-    {
+namespace mathex {
+    Token::Token(const Token &token) {
         this->type = token.type;
 
-        switch (this->type)
-        {
-        case TokenType::Constant:
+        switch (this->type) {
+        case TokenType::Constant: {
             this->data.constant = token.data.constant;
-            break;
+        } break;
 
-        case TokenType::Variable:
+        case TokenType::Variable: {
             this->data.variable = token.data.variable;
-            break;
+        } break;
 
-        case TokenType::Function:
+        case TokenType::Function: {
             new (&this->data.function) auto(token.data.function);
-            break;
+        } break;
 
-        case TokenType::BinaryOperator:
+        case TokenType::BinaryOperator: {
             new (&this->data.binaryOperator.invoke) auto(token.data.binaryOperator.invoke);
             this->data.binaryOperator.precedence = token.data.binaryOperator.precedence;
             this->data.binaryOperator.leftAssociative = token.data.binaryOperator.leftAssociative;
-            break;
+        } break;
 
-        case TokenType::UnaryOperator:
+        case TokenType::UnaryOperator: {
             new (&this->data.unaryOperator) auto(token.data.unaryOperator);
-            break;
+        } break;
 
-        default:
-            break;
+        default: {
+        } break;
         }
     }
 
@@ -66,10 +63,8 @@ namespace mathex
     Token::Token(Function function) : type(TokenType::Function), data(function) {}
     Token::Token(BinaryOperator binaryOperator, int precedence, bool leftAssociative) : type(TokenType::BinaryOperator), data(binaryOperator, precedence, leftAssociative) {}
     Token::Token(UnaryOperator unaryOperator) : type(TokenType::UnaryOperator), data(unaryOperator) {}
-    Token::~Token()
-    {
-        switch (this->type)
-        {
+    Token::~Token() {
+        switch (this->type) {
         case TokenType::Function:
             this->data.function.~function();
             break;

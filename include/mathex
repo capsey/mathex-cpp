@@ -29,13 +29,11 @@
 #include <string>
 #include <type_traits>
 
-namespace mathex
-{
+namespace mathex {
     /**
      * @brief Evaluation parameters.
      */
-    enum class Flags
-    {
+    enum class Flags {
         None = 0,                   // Disable all parameters.
         ImplicitParentheses = 1,    // Enable implicit parentheses.
         ImplicitMultiplication = 2, // Enable implicit multiplication.
@@ -50,13 +48,11 @@ namespace mathex
         Negation = 1024,            // Enable unary negation operator.
     };
 
-    inline constexpr Flags operator+(Flags a, Flags b)
-    {
+    inline constexpr Flags operator+(Flags a, Flags b) {
         return static_cast<Flags>(static_cast<std::underlying_type<Flags>::type>(a) | static_cast<std::underlying_type<Flags>::type>(b));
     }
 
-    inline constexpr Flags operator-(Flags a, Flags b)
-    {
+    inline constexpr Flags operator-(Flags a, Flags b) {
         return static_cast<Flags>(static_cast<std::underlying_type<Flags>::type>(a) & ~static_cast<std::underlying_type<Flags>::type>(b));
     }
 
@@ -68,8 +64,7 @@ namespace mathex
     /**
      * @brief Error codes.
      */
-    enum class Error
-    {
+    enum class Error {
         Success = 0,      // Parsed successfully.
         IllegalName,      // Name of variable/function contains illegal characters.
         AlreadyDefined,   // Trying to add a variable/function that already exists.
@@ -99,8 +94,7 @@ namespace mathex
     /**
      * @brief Configuration for parsing.
      */
-    class Config
-    {
+    class Config {
     public:
         /**
          * @brief Creates empty configuration object with given parsing parameters.

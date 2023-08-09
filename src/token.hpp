@@ -23,13 +23,11 @@
 #include "mathex"
 #include <functional>
 
-namespace mathex
-{
+namespace mathex {
     using BinaryOperator = std::function<double(double, double)>;
     using UnaryOperator = std::function<double(double)>;
 
-    enum class TokenType
-    {
+    enum class TokenType {
         None = 0,
         LeftParenthesis,
         RightParenthesis,
@@ -41,8 +39,7 @@ namespace mathex
         UnaryOperator,
     };
 
-    class Token
-    {
+    class Token {
     public:
         Token(const Token &token);                                                  // Copy
         Token(TokenType emptyType);                                                 // Empty token
@@ -54,8 +51,7 @@ namespace mathex
         ~Token();
 
         TokenType type;
-        union Data
-        {
+        union Data {
             Data();                                                                    // Empty token
             Data(double constant);                                                     // Constant
             Data(const double *variable);                                              // Variable
@@ -67,14 +63,12 @@ namespace mathex
             double constant;
             const double *variable;
             Function function;
-            struct
-            {
+            struct {
                 BinaryOperator invoke;
                 int precedence;
                 bool leftAssociative;
 
-                double operator()(double a, double b)
-                {
+                double operator()(double a, double b) {
                     return this->invoke(a, b);
                 }
             } binaryOperator;

@@ -17,13 +17,12 @@ The library is completely C++11 standard compliant.
 
 Using Mathex is super easy - just include one header, initialize and evaluate. That's it.
 
-```c
+```cpp
 #include <iostream>
 #include <mathex>
 #include <string>
 
-int main()
-{
+int main() {
     // Use `Config` class and `DefaultFlags` to get default settings.
     // For what settings are available, check out documentation.
     mathex::Config config(mathex::DefaultFlags);
@@ -40,9 +39,9 @@ int main()
 
     // Mathex writes result of evaluation into the reference you provide.
     // Here we pass a reference to a `result` variable we declared above.
-    if (config.evaluate(input, result) == mathex::Success)
-    {
-        std::cout << input << " is " << result << std::endl; // Outputs `2x + 5 is 8`
+    if (config.evaluate(input, result) == mathex::Success) {
+        // Outputs `2x + 5 is 8`
+        std::cout << input << " is " << result << std::endl;
     }
 }
 ```
@@ -50,7 +49,7 @@ int main()
 Don't forget to link Mathex when you compile your program:
 
 ```shell
-c++ program.c -lmathex++
+c++ program.cpp -lmathex++
 ```
 
 ## Building from source
@@ -58,8 +57,8 @@ c++ program.c -lmathex++
 To build the library, you need to clone the repository using Git and build the binary using GNU Make:
 
 ```shell
-git clone https://github.com/capsey/mathex-c.git
-cd ./mathex-c
+git clone https://github.com/capsey/mathex-cpp.git
+cd ./mathex-cpp
 make # to specify compiler: CXX=clang++ make
 ```
 

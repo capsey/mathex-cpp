@@ -28,21 +28,18 @@
 mathex::Config *config = nullptr;
 double result;
 
-void suite_setup(void)
-{
+void suite_setup(void) {
     config = new mathex::Config();
 }
 
-void suite_teardown(void)
-{
+void suite_teardown(void) {
     delete config;
     config = nullptr;
 }
 
 TestSuite(config, .init = suite_setup, .fini = suite_teardown);
 
-Test(config, addVariable)
-{
+Test(config, addVariable) {
     double x = 5;
     double y = 3;
 
@@ -66,8 +63,7 @@ Test(config, addVariable)
     cr_assert(config->evaluate("x + y", result) == mathex::Error::Undefined);
 }
 
-Test(config, addConstant)
-{
+Test(config, addConstant) {
     cr_assert(config->addConstant("e", 2.71) == mathex::Success, "successfully inserted first constant");
     cr_assert(config->addConstant("pi", 3.14) == mathex::Success, "successfully inserted second constant");
     cr_assert(config->addConstant("pi", 0) == mathex::Error::AlreadyDefined, "cannot redefine a constant");
@@ -82,12 +78,9 @@ Test(config, addConstant)
     cr_assert(config->evaluate("e + pi", result) == mathex::Error::Undefined);
 }
 
-Test(config, addFunction)
-{
-    auto foo_wrapper = [](double args[], int argc, double &result) -> mathex::Error
-    {
-        if (argc != 0)
-        {
+Test(config, addFunction) {
+    auto foo_wrapper = [](double args[], int argc, double &result) -> mathex::Error {
+        if (argc != 0) {
             return mathex::Error::IncorrectArgsNum;
         }
 
@@ -95,10 +88,8 @@ Test(config, addFunction)
         return mathex::Success;
     };
 
-    auto abs_wrapper = [](double args[], int argc, double &result) -> mathex::Error
-    {
-        if (argc != 1)
-        {
+    auto abs_wrapper = [](double args[], int argc, double &result) -> mathex::Error {
+        if (argc != 1) {
             return mathex::Error::IncorrectArgsNum;
         }
 
