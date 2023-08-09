@@ -1,7 +1,7 @@
 # Compiler flags
 AR := ar rcs
 
-LIBFLAGS := -g -std=c++11 -Wall -Werror -Wextra -Wconversion -Wpedantic
+LIBFLAGS := -g -O2 -std=c++11 -Wall -Werror -Wextra -Wconversion -Wpedantic
 CXXFLAGS := -g -std=c++11
 INCLUDES := -Iinclude
 
