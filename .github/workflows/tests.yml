@@ -1,0 +1,37 @@
+name: Run tests
+
+on: [pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CXX: ${{ matrix.cxx }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        cxx: [g++, clang++]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Criterion (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install libcriterion-dev
+
+    - name: Install Criterion (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew update
+        brew install criterion
+
+    - name: Build the library
+      run: make
+
+    - name: Run tests
+      run: make test
