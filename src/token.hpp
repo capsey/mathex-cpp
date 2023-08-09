@@ -1,13 +1,33 @@
+/*
+  Copyright (c) 2023 Caps Lock
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+*/
+
 #include "mathex"
 #include <functional>
 
-namespace mathex
-{
+namespace mathex {
     using BinaryOperator = std::function<double(double, double)>;
     using UnaryOperator = std::function<double(double)>;
 
-    enum class TokenType
-    {
+    enum class TokenType {
         None = 0,
         LeftParenthesis,
         RightParenthesis,
@@ -19,8 +39,7 @@ namespace mathex
         UnaryOperator,
     };
 
-    class Token
-    {
+    class Token {
     public:
         Token(const Token &token);                                                  // Copy
         Token(TokenType emptyType);                                                 // Empty token
@@ -32,8 +51,7 @@ namespace mathex
         ~Token();
 
         TokenType type;
-        union Data
-        {
+        union Data {
             Data();                                                                    // Empty token
             Data(double constant);                                                     // Constant
             Data(const double *variable);                                              // Variable
@@ -45,14 +63,12 @@ namespace mathex
             double constant;
             const double *variable;
             Function function;
-            struct
-            {
+            struct {
                 BinaryOperator invoke;
                 int precedence;
                 bool leftAssociative;
 
-                double operator()(double a, double b)
-                {
+                double operator()(double a, double b) {
                     return this->invoke(a, b);
                 }
             } binaryOperator;

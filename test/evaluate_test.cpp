@@ -1,3 +1,25 @@
+/*
+  Copyright (c) 2023 Caps Lock
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+*/
+
 #include <cmath>
 #include <criterion/criterion.h>
 #include <criterion/new/assert.h>
@@ -11,18 +33,15 @@ const double y = 3;
 const double z = 6;
 const double pi = 3.14;
 
-void suite_setup(void)
-{
+void suite_setup(void) {
     config = new mathex::Config(mathex::DefaultFlags + mathex::Flags::Exponentiation);
     config->addConstant("x", x);
     config->addConstant("y", y);
     config->addConstant("z", z);
     config->addConstant("pi", pi);
 
-    config->addFunction("foo", [](double args[], int argc, double &result) -> mathex::Error
-    {
-        if (argc != 2)
-        {
+    config->addFunction("foo", [](double args[], int argc, double &result) -> mathex::Error {
+        if (argc != 2) {
             return mathex::Error::IncorrectArgsNum;
         }
 
@@ -30,10 +49,8 @@ void suite_setup(void)
         return mathex::Success;
     });
 
-    config->addFunction("bar", [](double args[], int argc, double &result) -> mathex::Error
-    {
-        if (argc != 0)
-        {
+    config->addFunction("bar", [](double args[], int argc, double &result) -> mathex::Error {
+        if (argc != 0) {
             return mathex::Error::IncorrectArgsNum;
         }
 
@@ -41,10 +58,8 @@ void suite_setup(void)
         return mathex::Success;
     });
 
-    config->addFunction("f", [](double args[], int argc, double &result) -> mathex::Error
-    {
-        if (argc != 1)
-        {
+    config->addFunction("f", [](double args[], int argc, double &result) -> mathex::Error {
+        if (argc != 1) {
             return mathex::Error::IncorrectArgsNum;
         }
 
@@ -52,10 +67,8 @@ void suite_setup(void)
         return mathex::Success;
     });
 
-    config->addFunction("g", [](double args[], int argc, double &result) -> mathex::Error
-    {
-        if (argc != 1)
-        {
+    config->addFunction("g", [](double args[], int argc, double &result) -> mathex::Error {
+        if (argc != 1) {
             return mathex::Error::IncorrectArgsNum;
         }
 
@@ -63,10 +76,8 @@ void suite_setup(void)
         return mathex::Success;
     });
 
-    config->addFunction("h", [](double args[], int argc, double &result) -> mathex::Error
-    {
-        if (argc != 2)
-        {
+    config->addFunction("h", [](double args[], int argc, double &result) -> mathex::Error {
+        if (argc != 2) {
             return mathex::Error::IncorrectArgsNum;
         }
 
@@ -75,16 +86,14 @@ void suite_setup(void)
     });
 }
 
-void suite_teardown(void)
-{
+void suite_teardown(void) {
     delete config;
     config = nullptr;
 }
 
 TestSuite(evaluate, .init = suite_setup, .fini = suite_teardown);
 
-Test(evaluate, simple_expressions)
-{
+Test(evaluate, simple_expressions) {
     cr_expect(config->evaluate("5 + 3", result) == mathex::Success);
     cr_expect(ieee_ulp_eq(dbl, result, 8, 4));
 
@@ -116,8 +125,7 @@ Test(evaluate, simple_expressions)
     cr_expect(ieee_ulp_eq(dbl, result, 1000000000000, 4));
 }
 
-Test(evaluate, erroneous_expressions)
-{
+Test(evaluate, erroneous_expressions) {
     cr_expect(config->evaluate("5 5", result) == mathex::Error::SyntaxError);
     cr_expect(config->evaluate("() + 3", result) == mathex::Error::SyntaxError);
 
@@ -135,8 +143,7 @@ Test(evaluate, erroneous_expressions)
     cr_expect(config->evaluate("sin(90)", result) == mathex::Error::Undefined);
 }
 
-Test(evaluate, number_format)
-{
+Test(evaluate, number_format) {
     cr_expect(config->evaluate("30", result) == mathex::Success);
     cr_expect(ieee_ulp_eq(dbl, result, 30, 4));
 
@@ -170,8 +177,7 @@ Test(evaluate, number_format)
     cr_expect(config->evaluate("1.6e4.3", result) == mathex::Error::SyntaxError);
 }
 
-Test(evaluate, variables)
-{
+Test(evaluate, variables) {
     cr_expect(config->evaluate("x + 5", result) == mathex::Success);
     cr_expect(ieee_ulp_eq(dbl, result, 10, 4));
 
@@ -201,8 +207,7 @@ Test(evaluate, variables)
     cr_expect(config->evaluate("x + a", result) == mathex::Error::Undefined);
 }
 
-Test(evaluate, changing_variables)
-{
+Test(evaluate, changing_variables) {
     double var;
     config->addVariable("var", var);
 
@@ -217,8 +222,7 @@ Test(evaluate, changing_variables)
     config->remove("var");
 }
 
-Test(evaluate, functions)
-{
+Test(evaluate, functions) {
     cr_expect(config->evaluate("foo(2, 5)", result) == mathex::Success);
     cr_expect(ieee_ulp_eq(dbl, result, 2, 4));
 
