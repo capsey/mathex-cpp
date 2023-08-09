@@ -2,10 +2,10 @@
 #define MATHEX_HEADER
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <type_traits>
-#include <unordered_map>
 
 namespace mathex
 {
@@ -141,7 +141,7 @@ namespace mathex
 
     private:
         Flags m_Flags;
-        std::unordered_map<std::string, std::unique_ptr<Token>> m_Tokens;
+        std::map<std::string, std::unique_ptr<Token>> m_Tokens;
 
         bool readFlag(Flags flag);
     };
