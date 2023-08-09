@@ -18,6 +18,11 @@ namespace mathex
             return Error::IllegalName;
         }
 
+        if (this->m_Tokens.find(name) != this->m_Tokens.end())
+        {
+            return Error::AlreadyDefined;
+        }
+
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(&value));
         return Error::Success;
     }
@@ -29,6 +34,11 @@ namespace mathex
             return Error::IllegalName;
         }
 
+        if (this->m_Tokens.find(name) != this->m_Tokens.end())
+        {
+            return Error::AlreadyDefined;
+        }
+
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(value));
         return Error::Success;
     }
@@ -38,6 +48,11 @@ namespace mathex
         if (name.empty() || isdigit(name[0]) || !std::all_of(name.begin(), name.end(), [](const char &c) { return isalnum(c) || c == '_'; }))
         {
             return Error::IllegalName;
+        }
+
+        if (this->m_Tokens.find(name) != this->m_Tokens.end())
+        {
+            return Error::AlreadyDefined;
         }
 
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(apply));

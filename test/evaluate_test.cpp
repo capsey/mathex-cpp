@@ -19,7 +19,7 @@ void suite_setup(void)
     config->addConstant("z", z);
     config->addConstant("pi", pi);
 
-    config->addFunction("foo", [](double args[], int argc, double result) -> mathex::Error
+    config->addFunction("foo", [](double args[], int argc, double &result) -> mathex::Error
     {
         if (argc != 2)
         {
@@ -30,7 +30,7 @@ void suite_setup(void)
         return mathex::Success;
     });
 
-    config->addFunction("bar", [](double args[], int argc, double result) -> mathex::Error
+    config->addFunction("bar", [](double args[], int argc, double &result) -> mathex::Error
     {
         if (argc != 0)
         {
@@ -41,7 +41,7 @@ void suite_setup(void)
         return mathex::Success;
     });
 
-    config->addFunction("f", [](double args[], int argc, double result) -> mathex::Error
+    config->addFunction("f", [](double args[], int argc, double &result) -> mathex::Error
     {
         if (argc != 1)
         {
@@ -52,7 +52,7 @@ void suite_setup(void)
         return mathex::Success;
     });
 
-    config->addFunction("g", [](double args[], int argc, double result) -> mathex::Error
+    config->addFunction("g", [](double args[], int argc, double &result) -> mathex::Error
     {
         if (argc != 1)
         {
@@ -63,7 +63,7 @@ void suite_setup(void)
         return mathex::Success;
     });
 
-    config->addFunction("h", [](double args[], int argc, double result) -> mathex::Error
+    config->addFunction("h", [](double args[], int argc, double &result) -> mathex::Error
     {
         if (argc != 2)
         {
@@ -81,9 +81,9 @@ void suite_teardown(void)
     config = nullptr;
 }
 
-TestSuite(mx_evaluate, .init = suite_setup, .fini = suite_teardown);
+TestSuite(evaluate, .init = suite_setup, .fini = suite_teardown);
 
-Test(mx_evaluate, simple_expressions)
+Test(evaluate, simple_expressions)
 {
     cr_expect(config->evaluate("5 + 3", result) == mathex::Success);
     cr_expect(ieee_ulp_eq(dbl, result, 8, 4));
@@ -116,7 +116,7 @@ Test(mx_evaluate, simple_expressions)
     cr_expect(ieee_ulp_eq(dbl, result, 1000000000000, 4));
 }
 
-Test(mx_evaluate, erroneous_expressions)
+Test(evaluate, erroneous_expressions)
 {
     cr_expect(config->evaluate("5 5", result) == mathex::Error::SyntaxError);
     cr_expect(config->evaluate("() + 3", result) == mathex::Error::SyntaxError);
@@ -135,7 +135,7 @@ Test(mx_evaluate, erroneous_expressions)
     cr_expect(config->evaluate("sin(90)", result) == mathex::Error::Undefined);
 }
 
-Test(mx_evaluate, number_format)
+Test(evaluate, number_format)
 {
     cr_expect(config->evaluate("30", result) == mathex::Success);
     cr_expect(ieee_ulp_eq(dbl, result, 30, 4));
@@ -170,7 +170,7 @@ Test(mx_evaluate, number_format)
     cr_expect(config->evaluate("1.6e4.3", result) == mathex::Error::SyntaxError);
 }
 
-Test(mx_evaluate, variables)
+Test(evaluate, variables)
 {
     cr_expect(config->evaluate("x + 5", result) == mathex::Success);
     cr_expect(ieee_ulp_eq(dbl, result, 10, 4));
@@ -201,7 +201,7 @@ Test(mx_evaluate, variables)
     cr_expect(config->evaluate("x + a", result) == mathex::Error::Undefined);
 }
 
-Test(mx_evaluate, changing_variables)
+Test(evaluate, changing_variables)
 {
     double var;
     config->addVariable("var", var);
@@ -217,7 +217,7 @@ Test(mx_evaluate, changing_variables)
     config->remove("var");
 }
 
-Test(mx_evaluate, functions)
+Test(evaluate, functions)
 {
     cr_expect(config->evaluate("foo(2, 5)", result) == mathex::Success);
     cr_expect(ieee_ulp_eq(dbl, result, 2, 4));

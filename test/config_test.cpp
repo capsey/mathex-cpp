@@ -17,9 +17,9 @@ void suite_teardown(void)
     config = nullptr;
 }
 
-TestSuite(mx_evaluate, .init = suite_setup, .fini = suite_teardown);
+TestSuite(config, .init = suite_setup, .fini = suite_teardown);
 
-Test(mx_config, addVariable)
+Test(config, addVariable)
 {
     double x = 5;
     double y = 3;
@@ -44,7 +44,7 @@ Test(mx_config, addVariable)
     cr_assert(config->evaluate("x + y", result) == mathex::Error::Undefined);
 }
 
-Test(mx_config, addConstant)
+Test(config, addConstant)
 {
     cr_assert(config->addConstant("e", 2.71) == mathex::Success, "successfully inserted first constant");
     cr_assert(config->addConstant("pi", 3.14) == mathex::Success, "successfully inserted second constant");
@@ -60,7 +60,7 @@ Test(mx_config, addConstant)
     cr_assert(config->evaluate("e + pi", result) == mathex::Error::Undefined);
 }
 
-Test(mx_config, addFunction)
+Test(config, addFunction)
 {
     auto foo_wrapper = [](double args[], int argc, double &result) -> mathex::Error
     {
