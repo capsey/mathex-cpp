@@ -172,7 +172,7 @@ namespace mathex
                     {
                         if (ops_stack.top().type == TokenType::BinaryOperator)
                         {
-                            if (!(ops_stack.top().binaryOperator.precedence > MulToken.binaryOperator.precedence || (ops_stack.top().binaryOperator.precedence == MulToken.binaryOperator.precedence && MulToken.binaryOperator.leftAssociative)))
+                            if (!(ops_stack.top().data.binaryOperator.precedence > MulToken.data.binaryOperator.precedence || (ops_stack.top().data.binaryOperator.precedence == MulToken.data.binaryOperator.precedence && MulToken.data.binaryOperator.leftAssociative)))
                             {
                                 break;
                             }
@@ -310,7 +310,7 @@ namespace mathex
                     {
                         if (ops_stack.top().type == TokenType::BinaryOperator)
                         {
-                            if (!(ops_stack.top().binaryOperator.precedence > token->binaryOperator.precedence || (ops_stack.top().binaryOperator.precedence == token->binaryOperator.precedence && token->binaryOperator.leftAssociative)))
+                            if (!(ops_stack.top().data.binaryOperator.precedence > token->data.binaryOperator.precedence || (ops_stack.top().data.binaryOperator.precedence == token->data.binaryOperator.precedence && token->data.binaryOperator.leftAssociative)))
                             {
                                 break;
                             }
@@ -476,11 +476,11 @@ namespace mathex
             switch (out_queue.front().type)
             {
             case TokenType::Constant:
-                res_stack.push(out_queue.front().constant);
+                res_stack.push(out_queue.front().data.constant);
                 break;
 
             case TokenType::Variable:
-                res_stack.push(*out_queue.front().variable);
+                res_stack.push(*out_queue.front().data.variable);
                 break;
 
             case TokenType::BinaryOperator:
@@ -490,7 +490,7 @@ namespace mathex
                 double a = res_stack.top();
                 res_stack.pop();
 
-                res_stack.push(out_queue.front().binaryOperator(a, b));
+                res_stack.push(out_queue.front().data.binaryOperator(a, b));
             }
             break;
 
@@ -499,7 +499,7 @@ namespace mathex
                 double x = res_stack.top();
                 res_stack.pop();
 
-                res_stack.push(out_queue.front().unaryOperator(x));
+                res_stack.push(out_queue.front().data.unaryOperator(x));
             }
             break;
 
@@ -517,15 +517,15 @@ namespace mathex
 
                     for (int i = 0; i < args_num; i++)
                     {
-                        args[args_num - i - 1] = res_stack.top();
+                        args[(size_t)args_num - (size_t)i - 1] = res_stack.top();
                         res_stack.pop();
                     }
 
-                    error = out_queue.front().function(args.get(), args_num, func_result);
+                    error = out_queue.front().data.function(args.get(), args_num, func_result);
                 }
                 else
                 {
-                    error = out_queue.front().function(nullptr, 0, func_result);
+                    error = out_queue.front().data.function(nullptr, 0, func_result);
                 }
 
                 if (error != Error::Success)

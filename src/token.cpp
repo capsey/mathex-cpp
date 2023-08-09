@@ -12,25 +12,25 @@ namespace mathex
         switch (this->type)
         {
         case TokenType::Constant:
-            this->constant = token.constant;
+            this->data.constant = token.data.constant;
             break;
 
         case TokenType::Variable:
-            this->variable = token.variable;
+            this->data.variable = token.data.variable;
             break;
 
         case TokenType::Function:
-            new (&this->function) auto(token.function);
+            new (&this->data.function) auto(token.data.function);
             break;
 
         case TokenType::BinaryOperator:
-            new (&this->binaryOperator.invoke) auto(token.binaryOperator.invoke);
-            this->binaryOperator.precedence = token.binaryOperator.precedence;
-            this->binaryOperator.leftAssociative = token.binaryOperator.leftAssociative;
+            new (&this->data.binaryOperator.invoke) auto(token.data.binaryOperator.invoke);
+            this->data.binaryOperator.precedence = token.data.binaryOperator.precedence;
+            this->data.binaryOperator.leftAssociative = token.data.binaryOperator.leftAssociative;
             break;
 
         case TokenType::UnaryOperator:
-            new (&this->unaryOperator) auto(token.unaryOperator);
+            new (&this->data.unaryOperator) auto(token.data.unaryOperator);
             break;
 
         default:
@@ -39,32 +39,39 @@ namespace mathex
     }
 
     Token::Token(TokenType emptyType) : type(emptyType) {}
-    Token::Token(double constant) : type(TokenType::Constant), constant(constant) {}
-    Token::Token(const double *variable) : type(TokenType::Variable), variable(variable) {}
-    Token::Token(Function function) : type(TokenType::Function), function(function) {}
-    Token::Token(BinaryOperator binaryOperator, int precedence, bool leftAssociative) : type(TokenType::BinaryOperator), binaryOperator({binaryOperator, precedence, leftAssociative}) {}
-    Token::Token(UnaryOperator unaryOperator) : type(TokenType::UnaryOperator), unaryOperator(unaryOperator) {}
-
+    Token::Token(double constant) : type(TokenType::Constant), data(constant) {}
+    Token::Token(const double *variable) : type(TokenType::Variable), data(variable) {}
+    Token::Token(Function function) : type(TokenType::Function), data(function) {}
+    Token::Token(BinaryOperator binaryOperator, int precedence, bool leftAssociative) : type(TokenType::BinaryOperator), data(binaryOperator, precedence, leftAssociative) {}
+    Token::Token(UnaryOperator unaryOperator) : type(TokenType::UnaryOperator), data(unaryOperator) {}
     Token::~Token()
     {
         switch (this->type)
         {
         case TokenType::Function:
-            this->function.~function();
+            this->data.function.~function();
             break;
 
         case TokenType::BinaryOperator:
-            this->binaryOperator.invoke.~function();
+            this->data.binaryOperator.invoke.~function();
             break;
 
         case TokenType::UnaryOperator:
-            this->unaryOperator.~function();
+            this->data.unaryOperator.~function();
             break;
 
         default:
             break;
         }
     }
+
+    Token::Data::Data() {}
+    Token::Data::Data(double constant) : constant(constant) {}
+    Token::Data::Data(const double *variable) : variable(variable) {}
+    Token::Data::Data(Function function) : function(function) {}
+    Token::Data::Data(BinaryOperator binaryOperator, int precedence, bool leftAssociative) : binaryOperator({binaryOperator, precedence, leftAssociative}) {}
+    Token::Data::Data(UnaryOperator unaryOperator) : unaryOperator(unaryOperator) {}
+    Token::Data::~Data() {}
 
     const Token AddToken(std::plus<double>{}, 2, true);
     const Token SubToken(std::minus<double>{}, 2, true);

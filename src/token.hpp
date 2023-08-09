@@ -32,8 +32,16 @@ namespace mathex
         ~Token();
 
         TokenType type;
-        union
+        union Data
         {
+            Data();                                                                    // Empty token
+            Data(double constant);                                                     // Constant
+            Data(const double *variable);                                              // Variable
+            Data(Function function);                                                   // Function
+            Data(BinaryOperator binaryOperator, int precedence, bool leftAssociative); // Binary operator
+            Data(UnaryOperator unaryOperator);                                         // Unary operator
+            ~Data();
+
             double constant;
             const double *variable;
             Function function;
@@ -49,7 +57,7 @@ namespace mathex
                 }
             } binaryOperator;
             UnaryOperator unaryOperator;
-        };
+        } data;
     };
 
     extern const Token AddToken; // Addition operator.
