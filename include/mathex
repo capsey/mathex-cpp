@@ -23,9 +23,11 @@
 #ifndef MATHEX_HEADER
 #define MATHEX_HEADER
 
+#include <exception>
 #include <functional>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 
@@ -66,9 +68,6 @@ namespace mathex {
      */
     enum class Error {
         Success = 0,      // Parsed successfully.
-        IllegalName,      // Name of variable/function contains illegal characters.
-        AlreadyDefined,   // Trying to add a variable/function that already exists.
-        OutOfMemory,      // Out of memory.
         DivisionByZero,   // Division by zero.
         SyntaxError,      // Expression syntax is invalid.
         Undefined,        // Function or variable name not found.
@@ -110,9 +109,9 @@ namespace mathex {
          * @param name String representing name of the variable. (should only contain letters, digits or underscore and cannot start with a digit)
          * @param value Reference to value of the variable. Lifetime of a reference is responsibility of a caller.
          *
-         * @return Returns Error::Success, or error code if failed to insert.
+         * @throw Throws `std::invalid_argument` exception if name contains illegal characters or `mathex::AlreadyDefined` exception if variable was already defined.
          */
-        Error addVariable(const std::string &name, const double &value);
+        void addVariable(const std::string &name, const double &value);
 
         /**
          * @brief Inserts a constant into the configuration object to be available for use in the expressions.
@@ -120,9 +119,9 @@ namespace mathex {
          * @param name String representing name of the variable. (should only contain letters, digits or underscore and cannot start with a digit)
          * @param value Value of a constant variable.
          *
-         * @return Returns Error::Success, or error code if failed to insert.
+         * @throw Throws `std::invalid_argument` exception if name contains illegal characters or `mathex::AlreadyDefined` exception if variable was already defined.
          */
-        Error addConstant(const std::string &name, double value);
+        void addConstant(const std::string &name, double value);
 
         /**
          * @brief Inserts a function into the configuration object to be available for use in the expressions.
@@ -130,18 +129,18 @@ namespace mathex {
          * @param name String representing name of the function. (should only contain letters, digits or underscore and cannot start with a digit)
          * @param apply Function that takes the arguments, writes the result to the given reference and returns Error::Success or appropriate error code.
          *
-         * @return Returns Error::Success, or error code if failed to insert.
+         * @throw Throws `std::invalid_argument` exception if name contains illegal characters or `mathex::AlreadyDefined` exception if function was already defined.
          */
-        Error addFunction(const std::string &name, Function apply);
+        void addFunction(const std::string &name, Function apply);
 
         /**
          * @brief Removes a variable or a function with given name that was added using `addVariable`, `addConstant` or `addFunction`.
          *
          * @param name String representing name of the variable or function to remove.
          *
-         * @return Returns Error::Success, or error code if failed to remove.
+         * @return Returns whether the config contained a variable/function with given name.
          */
-        Error remove(const std::string &name);
+        bool remove(const std::string &name);
 
         /**
          * @brief Takes mathematical expression and evaluates its numerical value.
@@ -160,6 +159,18 @@ namespace mathex {
         std::map<std::string, std::unique_ptr<Token>> m_Tokens;
 
         bool readFlag(Flags flag);
+    };
+
+    class AlreadyDefined : public std::exception {
+    public:
+        AlreadyDefined(const std::string &name) : message("Identifier \"" + name + "\" was already defined!") {}
+
+        const char *what() const noexcept override {
+            return this->message.c_str();
+        }
+
+    private:
+        std::string message;
     };
 }
 
