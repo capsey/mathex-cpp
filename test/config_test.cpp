@@ -24,6 +24,7 @@
 #include <criterion/criterion.h>
 #include <criterion/new/assert.h>
 #include <mathex>
+#include <stdexcept>
 
 mathex::Config *config = nullptr;
 double result;
@@ -43,10 +44,10 @@ Test(config, addVariable) {
     double x = 5;
     double y = 3;
 
-    cr_assert(config->addVariable("x", x) == mathex::Success, "successfully inserted first variable");
-    cr_assert(config->addVariable("y", y) == mathex::Success, "successfully inserted second variable");
-    cr_assert(config->addVariable("y", y) == mathex::Error::AlreadyDefined, "cannot redefine a variable");
-    cr_assert(config->addVariable("رطانة", x) == mathex::Error::IllegalName, "did not accept id with illegal characters");
+    cr_assert_none_throw(config->addVariable("x", x));
+    cr_assert_none_throw(config->addVariable("y", y));
+    cr_assert_throw(config->addVariable("y", y), mathex::AlreadyDefined);
+    cr_assert_throw(config->addVariable("رطانة", x), std::invalid_argument);
 
     cr_assert(config->evaluate("x + y", result) == mathex::Success, "variables used in expressions without errors");
     cr_assert(ieee_ulp_eq(dbl, result, 8, 4), "calculations with variables are correct");
@@ -57,24 +58,24 @@ Test(config, addVariable) {
     cr_assert(config->evaluate("x + y", result) == mathex::Success, "changing value of a variable changes evaluated value");
     cr_assert(ieee_ulp_eq(dbl, result, 13, 4), "calculations with variables are correct");
 
-    cr_assert(config->remove("x") == mathex::Success);
-    cr_assert(config->remove("y") == mathex::Success);
-    cr_assert(config->remove("رطانة") == mathex::Error::Undefined);
+    cr_assert(config->remove("x"));
+    cr_assert(config->remove("y"));
+    cr_assert_not(config->remove("رطانة"));
     cr_assert(config->evaluate("x + y", result) == mathex::Error::Undefined);
 }
 
 Test(config, addConstant) {
-    cr_assert(config->addConstant("e", 2.71) == mathex::Success, "successfully inserted first constant");
-    cr_assert(config->addConstant("pi", 3.14) == mathex::Success, "successfully inserted second constant");
-    cr_assert(config->addConstant("pi", 0) == mathex::Error::AlreadyDefined, "cannot redefine a constant");
-    cr_assert(config->addConstant("رطانة", 0) == mathex::Error::IllegalName, "did not accept id with illegal characters");
+    cr_assert_none_throw(config->addConstant("e", 2.71));
+    cr_assert_none_throw(config->addConstant("pi", 3.14));
+    cr_assert_throw(config->addConstant("pi", 0), mathex::AlreadyDefined);
+    cr_assert_throw(config->addConstant("رطانة", 0), std::invalid_argument);
 
     cr_assert(config->evaluate("e + pi", result) == mathex::Success, "constants used in expressions without errors");
     cr_assert(ieee_ulp_eq(dbl, result, 5.85, 4), "calculations with constants are correct");
 
-    cr_assert(config->remove("e") == mathex::Success);
-    cr_assert(config->remove("pi") == mathex::Success);
-    cr_assert(config->remove("رطانة") == mathex::Error::Undefined);
+    cr_assert(config->remove("e"));
+    cr_assert(config->remove("pi"));
+    cr_assert_not(config->remove("رطانة"));
     cr_assert(config->evaluate("e + pi", result) == mathex::Error::Undefined);
 }
 
@@ -97,16 +98,16 @@ Test(config, addFunction) {
         return mathex::Success;
     };
 
-    cr_assert(config->addFunction("foo", foo_wrapper) == mathex::Success, "successfully inserted first function");
-    cr_assert(config->addFunction("abs", abs_wrapper) == mathex::Success, "successfully inserted second function");
-    cr_assert(config->addFunction("abs", abs_wrapper) == mathex::Error::AlreadyDefined, "cannot redefine a function");
-    cr_assert(config->addFunction("رطانة", foo_wrapper) == mathex::Error::IllegalName, "did not accept id with illegal characters");
+    cr_assert_none_throw(config->addFunction("foo", foo_wrapper));
+    cr_assert_none_throw(config->addFunction("abs", abs_wrapper));
+    cr_assert_throw(config->addFunction("abs", abs_wrapper), mathex::AlreadyDefined);
+    cr_assert_throw(config->addFunction("رطانة", foo_wrapper), std::invalid_argument);
 
     cr_assert(config->evaluate("abs(foo()) + 1.12", result) == mathex::Success, "functions used in expressions without errors");
     cr_assert(ieee_ulp_eq(dbl, result, 2.37, 4), "calculations with functions are correct");
 
-    cr_assert(config->remove("foo") == mathex::Success);
-    cr_assert(config->remove("abs") == mathex::Success);
-    cr_assert(config->remove("رطانة") == mathex::Error::Undefined);
+    cr_assert(config->remove("foo"));
+    cr_assert(config->remove("abs"));
+    cr_assert_not(config->remove("رطانة"));
     cr_assert(config->evaluate("abs(foo()) + 1.12", result) == mathex::Error::Undefined);
 }

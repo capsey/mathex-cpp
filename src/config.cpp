@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cctype>
 #include <memory>
+#include <stdexcept>
 #include <type_traits>
 
 namespace mathex {
@@ -32,51 +33,44 @@ namespace mathex {
 
     Config::~Config() {}
 
-    Error Config::addVariable(const std::string &name, const double &value) {
+    void Config::addVariable(const std::string &name, const double &value) {
         if (name.empty() || isdigit(name[0]) || !std::all_of(name.begin(), name.end(), [](const char &c) { return isalnum(c) || c == '_'; })) {
-            return Error::IllegalName;
+            throw std::invalid_argument(name);
         }
 
         if (this->m_Tokens.find(name) != this->m_Tokens.end()) {
-            return Error::AlreadyDefined;
+            throw AlreadyDefined(name);
         }
 
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(&value));
-        return Error::Success;
     }
 
-    Error Config::addConstant(const std::string &name, double value) {
+    void Config::addConstant(const std::string &name, double value) {
         if (name.empty() || isdigit(name[0]) || !std::all_of(name.begin(), name.end(), [](const char &c) { return isalnum(c) || c == '_'; })) {
-            return Error::IllegalName;
+            throw std::invalid_argument(name);
         }
 
         if (this->m_Tokens.find(name) != this->m_Tokens.end()) {
-            return Error::AlreadyDefined;
+            throw AlreadyDefined(name);
         }
 
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(value));
-        return Error::Success;
     }
 
-    Error Config::addFunction(const std::string &name, Function apply) {
+    void Config::addFunction(const std::string &name, Function apply) {
         if (name.empty() || isdigit(name[0]) || !std::all_of(name.begin(), name.end(), [](const char &c) { return isalnum(c) || c == '_'; })) {
-            return Error::IllegalName;
+            throw std::invalid_argument(name);
         }
 
         if (this->m_Tokens.find(name) != this->m_Tokens.end()) {
-            return Error::AlreadyDefined;
+            throw AlreadyDefined(name);
         }
 
         this->m_Tokens[name] = std::unique_ptr<Token>(new Token(apply));
-        return Error::Success;
     }
 
-    Error Config::remove(const std::string &name) {
-        if (this->m_Tokens.erase(name) == 0) {
-            return Error::Undefined;
-        }
-
-        return Error::Success;
+    bool Config::remove(const std::string &name) {
+        return this->m_Tokens.erase(name) > 0;
     }
 
     bool Config::readFlag(Flags flag) {
